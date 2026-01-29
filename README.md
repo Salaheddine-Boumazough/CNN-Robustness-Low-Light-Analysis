@@ -22,7 +22,7 @@ The following table summarizes the validation accuracy across the five controlle
 
 ### Low-Light Simulation Pipeline
 To mimic realistic nighttime conditions, we implemented a custom preprocessing pipeline with the following parameters:
-* ]Gamma Correction: 1.3 
+* Gamma Correction: 1.3 
 * Brightness Reduction: 0.9 multiplicative factor 
 * Sensor Noise: Gaussian noise with sigma = 0.03 
 
