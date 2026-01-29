@@ -1,34 +1,38 @@
-# Robustness Analysis of EfficientNetB0 to Domain Shift in Low-Light Conditions
+# Impact of Low-Light Data Augmentation on Emotion Recognition Robustness
 
-## Description
-This repository contains a research-focused study on the robustness of Convolutional Neural Networks (CNNs) when subjected to environmental domain shifts. Specifically, the project evaluates the EfficientNetB0 architecture's performance degradation in low-light conditions and explores the efficacy of targeted data augmentation as a mitigation strategy.
+This repository contains the implementation and experimental results for a study on the robustness of facial emotion recognition (FER) systems under significant illumination shifts. The research utilizes an EfficientNetB0 backbone to quantify performance degradation in low-light environments and evaluates mitigation strategies through consistent domain exposure and unsupervised adaptation.
 
 ## Abstract
-This study investigates how luminosity-based domain shifts impact the predictive accuracy of deep learning models. Using the CIFAR-10 dataset as a benchmark, we simulated varying degrees of low-light environments to quantify the performance gap between standard training and real-world degraded conditions. Our findings indicate that while baseline models suffer significant accuracy loss, the integration of custom low-light augmentation pipelines restores model reliability and improves feature extraction stability.
 
-## Key Features
-* Architecture: Implementation of EfficientNetB0 pre-trained on ImageNet.
-* Dataset: Evaluation conducted using the CIFAR-10 dataset.
-* Domain Shift Simulation: Custom scripts to simulate mild and combined low-light conditions for inference testing.
-* Robust Training: Implementation of a specialized data augmentation pipeline focusing on brightness and contrast variability.
+Facial emotion recognition (FER) systems deployed in real-world environments often face uncontrolled lighting conditions that differ significantly from standard training benchmarks. This study systematically evaluates the robustness of the EfficientNetB0 architecture on the Emotions Dataset under controlled low-light variations. We demonstrate that while a baseline model achieves 85.0% accuracy on clean data, it suffers a catastrophic 31% drop to 54.0% when exposed to mild low-light test conditions. Furthermore, we find that standard geometric augmentation (rotation, zoom) fails to improve robustness to lighting-based domain shifts. Through failure analysis using Gradient-weighted Class Activation Mapping (Grad-CAM), we show that the model loses semantic facial features in the dark, instead anchoring predictions on high-contrast background artifacts. Finally, we propose a consistent low-light training strategy that recovers performance to 69.3%, significantly improving the recognition of 'Sad' and 'Happy' expressions in challenging lighting.
 
-## Methodology
-The research follows a three-stage experimental design:
-1. Baseline Evaluation: Testing a model trained on standard lighting against standard test sets.
-2. Robustness Testing: Subjecting the baseline model to simulated low-light domain shifts to identify performance bottlenecks.
-3. Mitigation and Retraining: Training a second iteration of the model with a low-light augmentation strategy to evaluate recovery in accuracy and precision.
+## Experimental Results
 
-## Performance Metrics
-The performance was evaluated using confusion matrices and classification reports to analyze class-specific sensitivities to light degradation.
+The following table summarizes the validation accuracy across the five controlled experimental setups:
 
-| Scenario | Model Version | Key Finding |
-| :--- | :--- | :--- |
-| Standard Lighting | Baseline | High baseline accuracy across all 10 classes. |
-| Mild Low-Light | Baseline | Initial drop in recall for classes with low color contrast. |
-| Combined Low-Light | Baseline | Significant accuracy degradation and increased error rates. |
-| Combined Low-Light | Robust (Retrained) | Substantial recovery in accuracy and more balanced precision scores. |
+| Model | Training Strategy | Test Condition | Accuracy |
+| :--- | :--- | :--- | :--- |
+| **Model A** | Baseline (No Augmentation) | Normal | 85.0%  |
+| **Model B** | Standard Geometric | Normal | 82.1%  |
+| **Model C** | Aggressive Low-Light Augmentation | Low-Light | 70.7%  |
+| **Model D** | Baseline (Model A) | Low-Light | 54.0%  |
+| **Model E** | Consistent Mild Low-Light | Low-Light | 69.3%  |
 
-## Installation
-Ensure you have Python installed, then install the required dependencies:
-```bash
-pip install -r requirements.txt
+## Key Methodologies
+
+### Low-Light Simulation Pipeline
+To mimic realistic nighttime conditions, we implemented a custom preprocessing pipeline with the following parameters:
+* ]Gamma Correction: 1.3 
+* Brightness Reduction: 0.9 multiplicative factor 
+* Sensor Noise: Gaussian noise with sigma = 0.03 
+
+### Unsupervised Adaptation (AdaBN)
+As an alternative to retraining, we investigated Adaptive Batch Normalization (AdaBN). By updating only the Batch Normalization statistics on the low-light test stream for a single epoch, we observed an accuracy recovery of +4.9% (improving performance from 37.9% to 42.8% without labels). This implies that much of the performance drop is due to covariate shift in feature statistics rather than a total loss of feature extraction capability.
+
+## Visual Interpretability
+Using Grad-CAM, we localized the model's attention during failure cases. In low-light images, the network ignores semantic landmarks like the mouth and eyebrows, instead focusing on high-contrast regions such as neck shadows and clothing collars.
+
+## Author
+Salaheddine Boumazough |
+Computer Science |
+Al Akhawayn University / University of Helsinki Exchange
